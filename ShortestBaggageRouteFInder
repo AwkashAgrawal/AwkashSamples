@@ -1,0 +1,64 @@
+package com.test.baggage.route;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+
+public class ShortestBaggageRouteFinder implements RouteFinder {
+
+	private Collection<Node> graphNodes;
+	public List<Node> findRoute(Node sourceNode, Node targetNode) {
+		List<Node> path = new ArrayList<Node>();
+		Node node = targetNode;
+		while(node !=null && node != sourceNode)
+		{
+			path.add(node);
+			node = node.getPrevious();
+		}
+		Collections.reverse(path);
+		return path;
+	}
+	
+	public ShortestBaggageRouteFinder(Node source,Collection<Node> graphNodes)
+	{
+		this.graphNodes = graphNodes;
+		if(null == source)
+		{
+			throw new IllegalArgumentException("Source node cannot be null");
+		}
+		computePath(source);
+	}
+
+	private  void computePath(Node source) {
+
+		for(Node node: graphNodes)
+		{
+			node.setMinDistance(Double.POSITIVE_INFINITY);
+		}
+		PriorityQueue<Node> nodeQueue = new PriorityQueue<Node>(graphNodes);
+		nodeQueue.remove(source);
+		source.setMinDistance(0.);
+		nodeQueue.add(source);
+
+		while (!nodeQueue.isEmpty()) {
+			Node u = nodeQueue.peek();
+			nodeQueue.remove(u);
+			// Visit each edge exiting u
+			for (Connection e : u.getAdjacencies()) {
+				Node v = e.getTarget();
+				double weight = e.getWeight();
+				double distanceThroughU = u.getMinDistance() + weight;
+				if (distanceThroughU < v.getMinDistance()) {
+					nodeQueue.remove(v);
+					v.setMinDistance(distanceThroughU);
+					v.setPrevious(u);
+					nodeQueue.add(v);
+				}
+			}
+		}
+	}
+
+
+}
