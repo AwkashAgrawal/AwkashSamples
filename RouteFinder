@@ -1,0 +1,9 @@
+package com.test.baggage.route;
+
+import java.util.List;
+
+public interface RouteFinder {
+
+	public List<Node> findRoute(Node sourceNode, Node targetNode);
+	
+}
